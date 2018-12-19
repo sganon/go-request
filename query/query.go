@@ -92,7 +92,7 @@ func (d *Decoder) initInputProblem() {
 	}
 }
 
-func (d Decoder) setFromType(e reflect.Value, key, val string) {
+func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 	switch e.Type().Name() {
 	case "string":
 		e.SetString(val)
@@ -138,7 +138,7 @@ func (d Decoder) setFromType(e reflect.Value, key, val string) {
 		if targetType.Implements(request.TextUnmarshalerType) {
 			err = e.Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(val))
 		} else if targetType.Implements(request.StringSetterType) {
-			err = e.Addr().Interface().(stringSetter).Set(val)
+			err = e.Addr().Interface().(request.StringSetter).Set(val)
 		}
 		if err != nil {
 			d.addParamsError(request.ParamError{
