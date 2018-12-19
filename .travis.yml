@@ -2,11 +2,10 @@ language: go
 install: true
 sudo: false
 go_import_path: github.com/simon/go-request
-
 env:
   global:
   - GO111MODULE=on
-
+  - secure: ST0yvXd+vltXiCQO9jnMccBqTMmIcXYW4/9V3lpoQJebCXcYVEoE1GJN/16X+Bvl+CdLeR6lmoDZBxfCnWe89VVlHjJg6aYKxkzSRbgJKHi+z1BNhjV/qYTioWEDdu+n/bduQfLA2BaiPn32POlC2xtQi5qM2hieDK2fKJHOZ8ibtfswLggu6zsWBGp4BWU38AZyieYdKRpu4lPTB2yXlYmtAvmJrlbtjDC8Bk+9F9gMXEvgQ9MTL9JaZRC3jTCkp04zYBII0EXBdKOve+BaXI+ewX+pR70MfaiN97Hx22Kg2MF+cCblRO3mnGLeOH2iRzT1YZquYaCemSyaYoVIOp8YGnejbB9SuIYDlgFJWh0DTCfeVrLIhQeYzhe76FOiyXXEReYF+h0i4qFkVfSN1GdDYJNmwGRiiB52qnWi3fKXBcDjaWfsG2w2btXhMrG/YJZ0dp1PC15fwlo0v9JwiHlnq1FRW9ncldVq0iDcYQovhWNslSW0/GGzxuMQQRdGT4MoZhMf7hOI8F4TZq1jQTUTJQcB/n9SLGN1VJx803Ok8JGuZ6v+UINbq53O3TvQbaji0yps2Gnfnr5G1pbZfHUrIOMLOBY7i3RAWybwksr91jxBjoOsU11waUhxCdFwyOasjYAH08TsUdMvQu/dz40yD/P/z2Gmn6aZT6djj4I=
 matrix:
   include:
   - go: 1.9.x
@@ -19,4 +18,5 @@ matrix:
     - go test -v github.com/sganon/go-request/...
   - go: 1.11.x
     script:
-    - go test -v github.com/sganon/go-request/... -coverprofile=coverage.out
+    - go test -v ./... -coverprofile=coverage.out
+    - bash <(curl -s https://codecov.io/bash)
