@@ -3,7 +3,6 @@ package request
 import (
 	"encoding"
 	"errors"
-	"net/http"
 	"reflect"
 )
 
@@ -26,7 +25,7 @@ func (p *Payload) Validate() error {
 	if p.Type == "" {
 		p.Type = "about:blank"
 	}
-	if p.Title == "" || p.Status < http.StatusContinue {
+	if p.Title == "" || p.Status < 400 {
 		return ErrInvalidPayload
 	}
 	return nil
