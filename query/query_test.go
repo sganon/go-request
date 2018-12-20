@@ -82,6 +82,14 @@ var tests = []test{
 		},
 	},
 	{
+		Query: "?imp=here&id_list=21,AB,84",
+		Input: input{},
+		Output: input{
+			ImportantField: "here",
+		},
+		ShouldErr: true,
+	},
+	{
 		Query: "?imp=here&authors=sganon,ganondorf",
 		Input: input{},
 		Output: input{

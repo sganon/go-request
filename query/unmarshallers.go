@@ -16,6 +16,7 @@ func (l *IntList) UnmarshalText(text []byte) error {
 	for _, item := range items {
 		i, err := strconv.Atoi(item)
 		if err != nil {
+			*l = IntList(nil)
 			return err
 		}
 		*l = append(*l, i)
