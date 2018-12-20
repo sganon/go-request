@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	request "github.com/sganon/go-request"
+	"github.com/sganon/go-request/common"
 	"github.com/sganon/go-request/query"
 	"github.com/stretchr/testify/assert"
 )
@@ -115,7 +115,7 @@ func TestQueryDecoder(t *testing.T) {
 		decoder := query.NewDecoder(req)
 		err = decoder.Decode(&te.Input)
 		if te.ShouldErr {
-			assert.Equal(t, request.ErrInvalidParameters.Error(), err.Error(), "error should be equal to predefined one")
+			assert.Equal(t, common.ErrInvalidParameters.Error(), err.Error(), "error should be equal to predefined one")
 			assert.NotNil(t, err, "decode should have returned an error")
 		}
 		assert.Equal(t, te.Output, te.Input, "input should have been correctly decoded")

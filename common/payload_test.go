@@ -1,15 +1,15 @@
-package request_test
+package common_test
 
 import (
 	"net/http"
 	"testing"
 
-	request "github.com/sganon/go-request"
+	"github.com/sganon/go-request/common"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPayloadValidate(t *testing.T) {
-	payload := request.Payload{
+	payload := common.Payload{
 		Title:  "Test Payload",
 		Status: http.StatusInternalServerError,
 	}
@@ -19,21 +19,21 @@ func TestPayloadValidate(t *testing.T) {
 
 	payload.Title = ""
 	err = payload.Validate()
-	assert.Equal(t, request.ErrInvalidPayload, err)
+	assert.Equal(t, common.ErrInvalidPayload, err)
 	err = nil
 
 	payload.Title = "Test Payload"
 	payload.Status = http.StatusOK
 	err = payload.Validate()
-	assert.Equal(t, request.ErrInvalidPayload, err)
+	assert.Equal(t, common.ErrInvalidPayload, err)
 }
 
 func TestInputProblemError(t *testing.T) {
-	prob := request.InputProblem{}
-	assert.Equal(t, request.ErrInvalidParameters.Error(), prob.Error())
+	prob := common.InputProblem{}
+	assert.Equal(t, common.ErrInvalidParameters.Error(), prob.Error())
 }
 
 func TestInputUnexpectedError(t *testing.T) {
-	prob := request.UnexpectedProblem{}
-	assert.Equal(t, request.ErrUnexpected.Error(), prob.Error())
+	prob := common.UnexpectedProblem{}
+	assert.Equal(t, common.ErrUnexpected.Error(), prob.Error())
 }

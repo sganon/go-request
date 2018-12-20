@@ -1,8 +1,10 @@
-package request
+package common
 
 import (
 	"encoding"
+	"encoding/json"
 	"errors"
+	"net/http"
 	"reflect"
 )
 
@@ -12,6 +14,21 @@ var (
 	ErrInvalidParameters = errors.New("invalid parameters")
 	ErrUnexpected        = errors.New("unexpected error")
 )
+
+type Problem interface {
+	Send(http.ResponseWriter)
+}
+
+func baseSend(w http.ResponseWriter, status int, v interface{}) {
+	encoder := json.NewEncoder(w)
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(status)
+	err := encoder.Encode(v)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "an unexpected error occured"}`))
+	}
+}
 
 // Payload represents most basic payload of an `application/problem+json` response.
 type Payload struct {
@@ -37,6 +54,11 @@ type InputProblem struct {
 	InvalidParams []ParamError `json:"invalid_parameters"`
 }
 
+// Send implements Problem interface
+func (i InputProblem) Send(w http.ResponseWriter) {
+	baseSend(w, http.StatusBadRequest, i)
+}
+
 // Error implement error interface
 func (i InputProblem) Error() string {
 	return ErrInvalidParameters.Error()
@@ -54,6 +76,11 @@ type UnexpectedProblem Payload
 // Error implements error interface
 func (u UnexpectedProblem) Error() string {
 	return ErrUnexpected.Error()
+}
+
+// Send implements Problem interface
+func (u UnexpectedProblem) Send(w http.ResponseWriter) {
+	baseSend(w, http.StatusInternalServerError, u)
 }
 
 // StringSetter see flag.Value
