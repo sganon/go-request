@@ -18,5 +18,10 @@ matrix:
     - go test -v github.com/sganon/go-request/...
   - go: 1.11.x
     script:
-    - go test -race -v github.com/sganon/go-request/ github.com/sganon/go-request/query -coverprofile=coverage.txt -covermode=atomic
+    - |
+      go test -race -v
+        github.com/sganon/go-request/
+        github.com/sganon/go-request/query
+        github.com/sganon/go-request/common
+      -coverprofile=coverage.txt -covermode=atomic
     - bash <(curl -s https://codecov.io/bash)
