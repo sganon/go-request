@@ -18,10 +18,12 @@ type test struct {
 }
 
 type input struct {
-	Foo            string `request:"foo"`
-	ID             int    `request:"id"`
-	IsPresent      bool   `request:"is_present"`
-	ImportantField string `request:"imp,required"`
+	Foo            string           `request:"foo"`
+	ID             int              `request:"id"`
+	IsPresent      bool             `request:"is_present"`
+	ImportantField string           `request:"imp,required"`
+	IDList         query.IntList    `request:"id_list"`
+	Authors        query.StringList `request:"authors"`
 }
 
 var tests = []test{
@@ -69,6 +71,22 @@ var tests = []test{
 		Input: input{},
 		Output: input{
 			ImportantField: "here",
+		},
+	},
+	{
+		Query: "?imp=here&id_list=21,42,84",
+		Input: input{},
+		Output: input{
+			ImportantField: "here",
+			IDList:         query.IntList{21, 42, 84},
+		},
+	},
+	{
+		Query: "?imp=here&authors=sganon,ganondorf",
+		Input: input{},
+		Output: input{
+			ImportantField: "here",
+			Authors:        query.StringList{"sganon", "ganondorf"},
 		},
 	},
 	{
