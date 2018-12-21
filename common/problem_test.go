@@ -21,19 +21,31 @@ func TestInputUnexpectedError(t *testing.T) {
 func TestInputProblemSend(t *testing.T) {
 	w := httptest.NewRecorder()
 	prob := common.InputProblem{
-		Payload: common.Payload{
+		Payload: &common.Payload{
 			Title:  "Test problem",
 			Status: 400,
 		},
 	}
 	prob.Send(w)
+
+	prob.Status = 0
+	assert.Panics(t, func() {
+		prob.Send(w)
+	}, "send should panic if payload is not valid")
 }
 
 func TestUnexpectedProblemSend(t *testing.T) {
 	w := httptest.NewRecorder()
 	prob := common.UnexpectedProblem{
-		Title:  "Test problem",
-		Status: 500,
+		Payload: &common.Payload{
+			Title:  "Test problem",
+			Status: 500,
+		},
 	}
 	prob.Send(w)
+
+	prob.Status = 0
+	assert.Panics(t, func() {
+		prob.Send(w)
+	}, "send should panic if payload is not valid")
 }

@@ -27,9 +27,11 @@ func NewDecoder(r *http.Request) *Decoder {
 }
 
 var defaultErr = common.UnexpectedProblem{
-	Type:   "about:blank",
-	Title:  "An unexpected error occured decoding request",
-	Status: http.StatusInternalServerError,
+	Payload: &common.Payload{
+		Type:   "about:blank",
+		Title:  "An unexpected error occured decoding request",
+		Status: http.StatusInternalServerError,
+	},
 }
 
 // Decode input data from its request and stores it onto i.
@@ -84,7 +86,7 @@ func (d *Decoder) addParamsError(e common.ParamError) {
 
 func (d *Decoder) initInputProblem() {
 	d.InputProblem = &common.InputProblem{
-		Payload: common.Payload{
+		Payload: &common.Payload{
 			Type:   "about:blank",
 			Title:  "Your request parameters didn't validate.",
 			Status: http.StatusBadRequest,

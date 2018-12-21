@@ -22,12 +22,16 @@ func baseSend(w http.ResponseWriter, status int, v interface{}) {
 
 // InputProblem extends a standard problem payload with invalid parameters
 type InputProblem struct {
-	Payload
+	*Payload
 	InvalidParams []ParamError `json:"invalid_parameters"`
 }
 
 // Send implements Problem interface
 func (i InputProblem) Send(w http.ResponseWriter) {
+	err := i.Validate()
+	if err != nil {
+		panic(err)
+	}
 	baseSend(w, http.StatusBadRequest, i)
 }
 
@@ -43,7 +47,9 @@ type ParamError struct {
 }
 
 // UnexpectedProblem payload
-type UnexpectedProblem Payload
+type UnexpectedProblem struct {
+	*Payload
+}
 
 // Error implements error interface
 func (u UnexpectedProblem) Error() string {
@@ -52,5 +58,17 @@ func (u UnexpectedProblem) Error() string {
 
 // Send implements Problem interface
 func (u UnexpectedProblem) Send(w http.ResponseWriter) {
+	err := u.Validate()
+	if err != nil {
+		panic(err)
+	}
 	baseSend(w, http.StatusInternalServerError, u)
+}
+
+var DefaultProblem = UnexpectedProblem{
+	Payload: &Payload{
+		Type:   "about:blank",
+		Title:  "An unexpected error occured decoding request",
+		Status: http.StatusInternalServerError,
+	},
 }

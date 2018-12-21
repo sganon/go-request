@@ -27,11 +27,7 @@ func Decode(r *http.Request, inputQuery interface{}, inputBody interface{}) comm
 		defer r.Body.Close()
 		err := bodyDecoder.Decode(&inputBody)
 		if err != nil {
-			return &common.UnexpectedProblem{
-				Title:  "Unexpected error",
-				Type:   "about:blank",
-				Status: http.StatusInternalServerError,
-			}
+			return &common.DefaultProblem
 		}
 	}
 	return nil
