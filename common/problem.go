@@ -65,10 +65,18 @@ func (u UnexpectedProblem) Send(w http.ResponseWriter) {
 	baseSend(w, http.StatusInternalServerError, u)
 }
 
-var DefaultProblem = UnexpectedProblem{
+var DefaultUnexpectedProblem = UnexpectedProblem{
 	Payload: &Payload{
 		Type:   "about:blank",
 		Title:  "An unexpected error occured decoding request",
 		Status: http.StatusInternalServerError,
+	},
+}
+
+var DefaultInputProblem = InputProblem{
+	Payload: &Payload{
+		Type:   "about:blank",
+		Title:  "Your parameters didn't validate",
+		Status: http.StatusBadRequest,
 	},
 }

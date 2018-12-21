@@ -26,19 +26,11 @@ func NewDecoder(r *http.Request) *Decoder {
 	}
 }
 
-var defaultErr = common.UnexpectedProblem{
-	Payload: &common.Payload{
-		Type:   "about:blank",
-		Title:  "An unexpected error occured decoding request",
-		Status: http.StatusInternalServerError,
-	},
-}
-
 // Decode input data from its request and stores it onto i.
 func (d *Decoder) Decode(v interface{}) error {
 	// call ParseForm to prepare query extraction
 	if err := d.r.ParseForm(); err != nil {
-		return defaultErr
+		return common.DefaultUnexpectedProblem
 	}
 
 	elem := reflect.ValueOf(v).Elem()
@@ -85,13 +77,9 @@ func (d *Decoder) addParamsError(e common.ParamError) {
 }
 
 func (d *Decoder) initInputProblem() {
-	d.InputProblem = &common.InputProblem{
-		Payload: &common.Payload{
-			Type:   "about:blank",
-			Title:  "Your request parameters didn't validate.",
-			Status: http.StatusBadRequest,
-		},
-	}
+	prob := common.DefaultInputProblem
+	prob.Title = "Your query parameters could not be decoded"
+	d.InputProblem = &prob
 }
 
 func (d *Decoder) setFromType(e reflect.Value, key, val string) {

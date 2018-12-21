@@ -13,19 +13,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type test struct {
-	Method         string
-	Query          string
-	ExpectedStatus int
-	Body           inputBody
-}
-
 type inputQuery struct {
 	Foo string `request:"foo,required"`
 }
 
+func (q inputQuery) Validate() (errs []common.ParamError) {
+	if q.Foo != "bar" {
+		errs = append(errs, common.ParamError{
+			Field:  "foo",
+			Reason: "in query foo key should have `bar` value",
+		})
+	}
+	return errs
+}
+
 type inputBody struct {
 	Foo string `json:"foo"`
+}
+
+func (b inputBody) Validate() (errs []common.ParamError) {
+	if b.Foo != "baz" {
+		errs = append(errs, common.ParamError{
+			Field:  "foo",
+			Reason: "in body foo key should have `baz` value",
+		})
+	}
+	return errs
+}
+
+type test struct {
+	Method         string
+	Query          string
+	ExpectedStatus int
+	ErrorsLen      int
+	Body           inputBody
 }
 
 var tests = []test{
@@ -33,6 +54,7 @@ var tests = []test{
 		Method:         "GET",
 		Query:          "?",
 		ExpectedStatus: http.StatusBadRequest,
+		ErrorsLen:      2,
 	},
 	{
 		Method:         "GET",
@@ -44,6 +66,20 @@ var tests = []test{
 		Query:          "?foo=bar",
 		Body:           inputBody{Foo: "baz"},
 		ExpectedStatus: http.StatusOK,
+	},
+	{
+		Method:         "POST",
+		Query:          "?foo=bar",
+		Body:           inputBody{Foo: "bur"},
+		ExpectedStatus: http.StatusBadRequest,
+		ErrorsLen:      1,
+	},
+	{
+		Method:         "POST",
+		Query:          "?foo=nope",
+		Body:           inputBody{Foo: "bur"},
+		ExpectedStatus: http.StatusBadRequest,
+		ErrorsLen:      2,
 	},
 }
 
@@ -66,6 +102,14 @@ func TestDecode(t *testing.T) {
 		assert.Equal(t, te.ExpectedStatus, res.StatusCode)
 		if res.StatusCode != http.StatusOK {
 			assert.Equal(t, "application/problem+json", res.Header.Get("Content-Type"))
+		}
+		if res.StatusCode == http.StatusBadRequest {
+			var resBody common.InputProblem
+			decoder := json.NewDecoder(res.Body)
+			defer res.Body.Close()
+			err := decoder.Decode(&resBody)
+			assert.NoError(t, err)
+			assert.Equal(t, te.ErrorsLen, len(resBody.InvalidParams))
 		}
 	}
 }
