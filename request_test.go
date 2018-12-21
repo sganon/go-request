@@ -1,13 +1,15 @@
 package request_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	request "github.com/sganon/go-request"
+	"github.com/sganon/go-request/common"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,10 +17,15 @@ type test struct {
 	Method         string
 	Query          string
 	ExpectedStatus int
+	Body           inputBody
 }
 
 type inputQuery struct {
 	Foo string `request:"foo,required"`
+}
+
+type inputBody struct {
+	Foo string `json:"foo"`
 }
 
 var tests = []test{
@@ -32,13 +39,24 @@ var tests = []test{
 		Query:          "?foo=bar",
 		ExpectedStatus: http.StatusOK,
 	},
+	{
+		Method:         "POST",
+		Query:          "?foo=bar",
+		Body:           inputBody{Foo: "baz"},
+		ExpectedStatus: http.StatusOK,
+	},
 }
 
 func TestDecode(t *testing.T) {
 	ts := httptest.NewServer(handlerFunc)
 	defer ts.Close()
 	for _, te := range tests {
-		var body io.Reader
+		body := new(bytes.Buffer)
+		if te.Body != (inputBody{}) {
+			encoder := json.NewEncoder(body)
+			err := encoder.Encode(te.Body)
+			assert.NoError(t, err)
+		}
 		req, err := http.NewRequest(te.Method, fmt.Sprintf("%s/%s", ts.URL, te.Query), body)
 		assert.NoError(t, err)
 		client := http.DefaultClient
@@ -54,7 +72,13 @@ func TestDecode(t *testing.T) {
 
 var handlerFunc = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	var query inputQuery
-	problem := request.Decode(r, &query, nil)
+	var body inputBody
+	var problem common.Problem
+	if r.Method == "POST" {
+		problem = request.Decode(r, &query, &body)
+	} else {
+		problem = request.Decode(r, &query, nil)
+	}
 	if problem != nil {
 		problem.Send(w)
 		return
