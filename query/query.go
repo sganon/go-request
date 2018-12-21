@@ -137,10 +137,10 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 	default:
 		var err error
 		targetType := reflect.PtrTo(e.Type())
-		if targetType.Implements(common.TextUnmarshalerType) {
+		if targetType.Implements(TextUnmarshalerType) {
 			err = e.Addr().Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(val))
-		} else if targetType.Implements(common.StringSetterType) {
-			err = e.Addr().Interface().(common.StringSetter).Set(val)
+		} else if targetType.Implements(StringSetterType) {
+			err = e.Addr().Interface().(StringSetter).Set(val)
 		}
 		if err != nil {
 			d.addParamsError(common.ParamError{

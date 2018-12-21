@@ -1,9 +1,7 @@
 package common
 
 import (
-	"encoding"
 	"errors"
-	"reflect"
 )
 
 // Differents payload issues
@@ -30,14 +28,3 @@ func (p *Payload) Validate() error {
 	}
 	return nil
 }
-
-// StringSetter see flag.Value
-type StringSetter interface {
-	Set(string) error
-}
-
-// Types implementing TexTUnmarshaler and StringSetter used on unmarshalling
-var (
-	TextUnmarshalerType = reflect.TypeOf(new(encoding.TextUnmarshaler)).Elem()
-	StringSetterType    = reflect.TypeOf(new(StringSetter)).Elem()
-)
