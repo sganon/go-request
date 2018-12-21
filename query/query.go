@@ -98,6 +98,7 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 		e.SetString(val)
 		break
 	case "int64":
+		fallthrough
 	case "int":
 		v, err := strconv.Atoi(val)
 		if err != nil {
@@ -110,6 +111,7 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 		e.SetInt(int64(v))
 		break
 	case "float32":
+		fallthrough
 	case "float64":
 		v, err := strconv.ParseFloat(val, 32)
 		if err != nil {

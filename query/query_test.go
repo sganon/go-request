@@ -22,6 +22,7 @@ type input struct {
 	ID             int              `request:"id"`
 	IsPresent      bool             `request:"is_present"`
 	ImportantField string           `request:"imp,required"`
+	Temperature    float32          `request:"temperature"`
 	IDList         query.IntList    `request:"id_list"`
 	Authors        query.StringList `request:"authors"`
 }
@@ -67,11 +68,35 @@ var tests = []test{
 		},
 	},
 	{
+		Query: "?imp=here&is_present=vrai",
+		Input: input{},
+		Output: input{
+			ImportantField: "here",
+		},
+		ShouldErr: true,
+	},
+	{
 		Query: "?imp=here&is_present=false",
 		Input: input{},
 		Output: input{
 			ImportantField: "here",
 		},
+	},
+	{
+		Query: "?imp=here&temperature=42.21",
+		Input: input{},
+		Output: input{
+			ImportantField: "here",
+			Temperature:    42.21,
+		},
+	},
+	{
+		Query: "?imp=here&temperature=not_a_float",
+		Input: input{},
+		Output: input{
+			ImportantField: "here",
+		},
+		ShouldErr: true,
 	},
 	{
 		Query: "?imp=here&id_list=21,42,84",
@@ -109,15 +134,15 @@ var suite []test
 
 func TestQueryDecoder(t *testing.T) {
 	var body io.Reader
-	for _, te := range tests {
+	for i, te := range tests {
 		req, err := http.NewRequest("GET", "http://localhost:80/"+te.Query, body)
-		assert.Nil(t, err, "request should have been created")
+		assert.Nil(t, err, "request should have been created", i)
 		decoder := query.NewDecoder(req)
 		err = decoder.Decode(&te.Input)
 		if te.ShouldErr {
-			assert.Equal(t, common.ErrInvalidParameters.Error(), err.Error(), "error should be equal to predefined one")
-			assert.NotNil(t, err, "decode should have returned an error")
+			assert.Equal(t, common.ErrInvalidParameters.Error(), err.Error(), "error should be equal to predefined one", i)
+			assert.NotNil(t, err, "decode should have returned an error", i)
 		}
-		assert.Equal(t, te.Output, te.Input, "input should have been correctly decoded")
+		assert.Equal(t, te.Output, te.Input, "input should have been correctly decoded", i)
 	}
 }
