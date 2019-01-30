@@ -1,4 +1,4 @@
-package common
+package problem
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ func baseSend(w http.ResponseWriter, status int, v interface{}) {
 	}
 }
 
-// InputProblem extends a standard problem payload with invalid parameters
+// InputProblem extends a standard problem problem with invalid parameters
 type InputProblem struct {
 	*Payload
 	InvalidParams []ParamError `json:"invalid_parameters"`
@@ -46,7 +46,7 @@ type ParamError struct {
 	Reason string `json:"reason"`
 }
 
-// UnexpectedProblem payload
+// UnexpectedProblem problem
 type UnexpectedProblem struct {
 	*Payload
 }

@@ -1,17 +1,17 @@
-package common
+package problem
 
 import (
 	"errors"
 )
 
-// Differents payload issues
+// Differents problem issues
 var (
-	ErrInvalidPayload    = errors.New("invalid payload")
+	ErrInvalidPayload    = errors.New("invalid problem")
 	ErrInvalidParameters = errors.New("invalid parameters")
 	ErrUnexpected        = errors.New("unexpected error")
 )
 
-// Payload represents most basic payload of an `application/problem+json` response.
+// Payload represents most basic problem of an `application/problem+json` response.
 type Payload struct {
 	Type   string `json:"type"`
 	Title  string `json:"title"`

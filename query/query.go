@@ -8,14 +8,14 @@ import (
 	"strconv"
 
 	"github.com/fatih/structtag"
-	"github.com/sganon/go-request/common"
+	"github.com/sganon/go-request/problem"
 )
 
 // Decoder handles unmarshalling and validation of its request's query
 type Decoder struct {
 	r              *http.Request
 	BoolStrictMode bool
-	InputProblem   *common.InputProblem
+	InputProblem   *problem.InputProblem
 }
 
 // NewDecoder return a pointer to a new decoder
@@ -30,7 +30,7 @@ func NewDecoder(r *http.Request) *Decoder {
 func (d *Decoder) Decode(v interface{}) error {
 	// call ParseForm to prepare query extraction
 	if err := d.r.ParseForm(); err != nil {
-		return common.DefaultUnexpectedProblem
+		return problem.DefaultUnexpectedProblem
 	}
 
 	elem := reflect.ValueOf(v).Elem()
@@ -58,7 +58,7 @@ func (d *Decoder) extractQuery(key string, required bool, e reflect.Value) {
 		return
 	}
 	if val == "" && required {
-		d.addParamsError(common.ParamError{
+		d.addParamsError(problem.ParamError{
 			Field:  key,
 			Reason: "parameter is required",
 		})
@@ -69,7 +69,7 @@ func (d *Decoder) extractQuery(key string, required bool, e reflect.Value) {
 	d.setFromType(e, key, val)
 }
 
-func (d *Decoder) addParamsError(e common.ParamError) {
+func (d *Decoder) addParamsError(e problem.ParamError) {
 	if d.InputProblem == nil {
 		d.initInputProblem()
 	}
@@ -77,7 +77,7 @@ func (d *Decoder) addParamsError(e common.ParamError) {
 }
 
 func (d *Decoder) initInputProblem() {
-	prob := common.DefaultInputProblem
+	prob := problem.DefaultInputProblem
 	prob.Title = "Your query parameters could not be decoded"
 	d.InputProblem = &prob
 }
@@ -92,7 +92,7 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 	case "int":
 		v, err := strconv.Atoi(val)
 		if err != nil {
-			d.addParamsError(common.ParamError{
+			d.addParamsError(problem.ParamError{
 				Field:  key,
 				Reason: "syntax error: unable to convert to integer",
 			})
@@ -105,7 +105,7 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 	case "float64":
 		v, err := strconv.ParseFloat(val, 32)
 		if err != nil {
-			d.addParamsError(common.ParamError{
+			d.addParamsError(problem.ParamError{
 				Field:  key,
 				Reason: "syntax error: unable to convert to float",
 			})
@@ -116,7 +116,7 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 	case "bool":
 		v, err := strconv.ParseBool(val)
 		if err != nil {
-			d.addParamsError(common.ParamError{
+			d.addParamsError(problem.ParamError{
 				Field:  key,
 				Reason: "syntax error: unable to convert to bool",
 			})
@@ -133,7 +133,7 @@ func (d *Decoder) setFromType(e reflect.Value, key, val string) {
 			err = e.Addr().Interface().(StringSetter).Set(val)
 		}
 		if err != nil {
-			d.addParamsError(common.ParamError{
+			d.addParamsError(problem.ParamError{
 				Field:  key,
 				Reason: fmt.Sprintf("an error occured via UnmarshalText: %v", err),
 			})

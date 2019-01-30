@@ -1,27 +1,27 @@
-package common_test
+package problem_test
 
 import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/sganon/go-request/common"
+	"github.com/sganon/go-request/problem"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInputProblemError(t *testing.T) {
-	prob := common.InputProblem{}
-	assert.Equal(t, common.ErrInvalidParameters.Error(), prob.Error())
+	prob := problem.InputProblem{}
+	assert.Equal(t, problem.ErrInvalidParameters.Error(), prob.Error())
 }
 
 func TestInputUnexpectedError(t *testing.T) {
-	prob := common.UnexpectedProblem{}
-	assert.Equal(t, common.ErrUnexpected.Error(), prob.Error())
+	prob := problem.UnexpectedProblem{}
+	assert.Equal(t, problem.ErrUnexpected.Error(), prob.Error())
 }
 
 func TestInputProblemSend(t *testing.T) {
 	w := httptest.NewRecorder()
-	prob := common.InputProblem{
-		Payload: &common.Payload{
+	prob := problem.InputProblem{
+		Payload: &problem.Payload{
 			Title:  "Test problem",
 			Status: 400,
 		},
@@ -31,13 +31,13 @@ func TestInputProblemSend(t *testing.T) {
 	prob.Status = 0
 	assert.Panics(t, func() {
 		prob.Send(w)
-	}, "send should panic if payload is not valid")
+	}, "send should panic if problem is not valid")
 }
 
 func TestUnexpectedProblemSend(t *testing.T) {
 	w := httptest.NewRecorder()
-	prob := common.UnexpectedProblem{
-		Payload: &common.Payload{
+	prob := problem.UnexpectedProblem{
+		Payload: &problem.Payload{
 			Title:  "Test problem",
 			Status: 500,
 		},
@@ -47,5 +47,5 @@ func TestUnexpectedProblemSend(t *testing.T) {
 	prob.Status = 0
 	assert.Panics(t, func() {
 		prob.Send(w)
-	}, "send should panic if payload is not valid")
+	}, "send should panic if problem is not valid")
 }
