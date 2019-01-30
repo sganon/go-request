@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	request "github.com/sganon/go-request"
-	"github.com/sganon/go-request/common"
+	"github.com/sganon/go-request/problem"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,9 +17,9 @@ type inputQuery struct {
 	Foo string `request:"foo,required"`
 }
 
-func (q inputQuery) Validate() (errs []common.ParamError) {
+func (q inputQuery) Validate() (errs []problem.ParamError) {
 	if q.Foo != "bar" {
-		errs = append(errs, common.ParamError{
+		errs = append(errs, problem.ParamError{
 			Field:  "foo",
 			Reason: "in query foo key should have `bar` value",
 		})
@@ -31,9 +31,9 @@ type inputBody struct {
 	Foo string `json:"foo"`
 }
 
-func (b inputBody) Validate() (errs []common.ParamError) {
+func (b inputBody) Validate() (errs []problem.ParamError) {
 	if b.Foo != "baz" {
-		errs = append(errs, common.ParamError{
+		errs = append(errs, problem.ParamError{
 			Field:  "foo",
 			Reason: "in body foo key should have `baz` value",
 		})
@@ -104,7 +104,7 @@ func TestDecode(t *testing.T) {
 			assert.Equal(t, "application/problem+json", res.Header.Get("Content-Type"))
 		}
 		if res.StatusCode == http.StatusBadRequest {
-			var resBody common.InputProblem
+			var resBody problem.InputProblem
 			decoder := json.NewDecoder(res.Body)
 			defer res.Body.Close()
 			err := decoder.Decode(&resBody)
@@ -117,7 +117,7 @@ func TestDecode(t *testing.T) {
 var handlerFunc = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	var query inputQuery
 	var body inputBody
-	var problem common.Problem
+	var problem problem.Problem
 	if r.Method == "POST" {
 		problem = request.Decode(r, &query, &body)
 	} else {
