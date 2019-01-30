@@ -15,7 +15,7 @@ import (
 type Decoder struct {
 	r              *http.Request
 	BoolStrictMode bool
-	InputProblem   *problem.InputProblem
+	Input          *problem.Input
 }
 
 // NewDecoder return a pointer to a new decoder
@@ -30,7 +30,7 @@ func NewDecoder(r *http.Request) *Decoder {
 func (d *Decoder) Decode(v interface{}) error {
 	// call ParseForm to prepare query extraction
 	if err := d.r.ParseForm(); err != nil {
-		return problem.DefaultUnexpectedProblem
+		return problem.DefaultUnexpected
 	}
 
 	elem := reflect.ValueOf(v).Elem()
@@ -47,7 +47,7 @@ func (d *Decoder) Decode(v interface{}) error {
 
 		d.extractQuery(inputTag.Name, inputTag.HasOption("required"), elem.Field(i))
 	}
-	return d.InputProblem
+	return d.Input
 }
 
 func (d *Decoder) extractQuery(key string, required bool, e reflect.Value) {
@@ -70,16 +70,16 @@ func (d *Decoder) extractQuery(key string, required bool, e reflect.Value) {
 }
 
 func (d *Decoder) addParamsError(e problem.ParamError) {
-	if d.InputProblem == nil {
+	if d.Input == nil {
 		d.initInputProblem()
 	}
-	d.InputProblem.InvalidParams = append(d.InputProblem.InvalidParams, e)
+	d.Input.InvalidParams = append(d.Input.InvalidParams, e)
 }
 
 func (d *Decoder) initInputProblem() {
-	prob := problem.DefaultInputProblem
+	prob := problem.DefaultInput
 	prob.Title = "Your query parameters could not be decoded"
-	d.InputProblem = &prob
+	d.Input = &prob
 }
 
 func (d *Decoder) setFromType(e reflect.Value, key, val string) {

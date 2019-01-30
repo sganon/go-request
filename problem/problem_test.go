@@ -9,7 +9,7 @@ import (
 )
 
 func TestInputProblemError(t *testing.T) {
-	prob := problem.InputProblem{}
+	prob := problem.Input{}
 	assert.Equal(t, problem.ErrInvalidParameters.Error(), prob.Error())
 }
 
@@ -20,7 +20,7 @@ func TestInputUnexpectedError(t *testing.T) {
 
 func TestInputProblemSend(t *testing.T) {
 	w := httptest.NewRecorder()
-	prob := problem.InputProblem{
+	prob := problem.Input{
 		Payload: &problem.Payload{
 			Title:  "Test problem",
 			Status: 400,

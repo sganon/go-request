@@ -104,7 +104,7 @@ func TestDecode(t *testing.T) {
 			assert.Equal(t, "application/problem+json", res.Header.Get("Content-Type"))
 		}
 		if res.StatusCode == http.StatusBadRequest {
-			var resBody problem.InputProblem
+			var resBody problem.Input
 			decoder := json.NewDecoder(res.Body)
 			defer res.Body.Close()
 			err := decoder.Decode(&resBody)

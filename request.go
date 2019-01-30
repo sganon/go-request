@@ -14,12 +14,12 @@ type Output interface {
 
 func Decode(r *http.Request, queryOutput Output, bodyOutput Output) problem.Problem {
 	var ok bool
-	var inputProblem *problem.InputProblem
+	var inputProblem *problem.Input
 	var unexpectedProblem *problem.UnexpectedProblem
 	if queryOutput != nil {
 		queryDecoder := query.NewDecoder(r)
 		err := queryDecoder.Decode(queryOutput)
-		if prob, ok := err.(*problem.InputProblem); ok && prob != nil {
+		if prob, ok := err.(*problem.Input); ok && prob != nil {
 			inputProblem = prob
 		}
 		if unexpectedProblem, ok = err.(*problem.UnexpectedProblem); ok && unexpectedProblem != nil {
@@ -28,7 +28,7 @@ func Decode(r *http.Request, queryOutput Output, bodyOutput Output) problem.Prob
 		queryErrors := queryOutput.Validate()
 		if len(queryErrors) > 0 {
 			if inputProblem == nil {
-				prob := problem.DefaultInputProblem
+				prob := problem.DefaultInput
 				inputProblem = &prob
 			}
 			inputProblem.InvalidParams = append(inputProblem.InvalidParams, queryErrors...)
@@ -39,12 +39,12 @@ func Decode(r *http.Request, queryOutput Output, bodyOutput Output) problem.Prob
 		defer r.Body.Close()
 		err := bodyDecoder.Decode(&bodyOutput)
 		if err != nil {
-			return &problem.DefaultUnexpectedProblem
+			return &problem.DefaultUnexpected
 		}
 		bodyErrors := bodyOutput.Validate()
 		if len(bodyErrors) > 0 {
 			if inputProblem == nil {
-				prob := problem.DefaultInputProblem
+				prob := problem.DefaultInput
 				inputProblem = &prob
 			}
 			inputProblem.InvalidParams = append(inputProblem.InvalidParams, bodyErrors...)
