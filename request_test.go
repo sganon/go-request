@@ -14,7 +14,7 @@ import (
 )
 
 type inputQuery struct {
-	Foo string `request:"foo,required"`
+	Foo string `query:"foo,required"`
 }
 
 func (q inputQuery) Validate() (errs []problem.ParamError) {

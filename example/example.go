@@ -9,11 +9,11 @@ import (
 	"github.com/sganon/go-request/query"
 )
 
-// Define a the model of an expected query
+// Query Define a the model of an expected query
 type Query struct {
-	Foo   string           `request:"foo"`
-	IDs   query.IntList    `request:"ids,required"`
-	Names query.StringList `request:"names"`
+	Foo   string           `query:"foo"`
+	IDs   query.IntList    `query:"ids,required"`
+	Names query.StringList `query:"names"`
 }
 
 // Validate implements request.Output

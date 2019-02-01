@@ -18,13 +18,13 @@ type test struct {
 }
 
 type input struct {
-	Foo            string           `request:"foo"`
-	ID             int              `request:"id"`
-	IsPresent      bool             `request:"is_present"`
-	ImportantField string           `request:"imp,required"`
-	Temperature    float32          `request:"temperature"`
-	IDList         query.IntList    `request:"id_list"`
-	Authors        query.StringList `request:"authors"`
+	Foo            string           `query:"foo"`
+	ID             int              `query:"id"`
+	IsPresent      bool             `query:"is_present"`
+	ImportantField string           `query:"imp,required"`
+	Temperature    float32          `query:"temperature"`
+	IDList         query.IntList    `query:"id_list"`
+	Authors        query.StringList `query:"authors"`
 }
 
 var tests = []test{

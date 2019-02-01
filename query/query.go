@@ -39,7 +39,7 @@ func (d *Decoder) Decode(v interface{}) error {
 		fieldTag := elem.Type().Field(i).Tag
 
 		tags, err := structtag.Parse(string(fieldTag))
-		inputTag, err := tags.Get("request")
+		inputTag, err := tags.Get("query")
 		if err != nil {
 			// Skip if field has no input tag
 			continue

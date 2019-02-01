@@ -22,9 +22,9 @@ error handling.
 ```go
 // Query represents the expected query parameters of your request
 type Query struct {
-  Foo string        `request:"foo"` // the 'foo' query parameter will be stored into this field
-  Bar int           `request:"bar,required"` // this parameter is required
-  IDs query.IntList `request:"ids"` // this type is an helper to store `ids=1,2,3....` into an int slice
+  Foo string        `query:"foo"` // the 'foo' query parameter will be stored into this field
+  Bar int           `query:"bar,required"` // this parameter is required
+  IDs query.IntList `query:"ids"` // this type is an helper to store `ids=1,2,3....` into an int slice
   // You can set custom types but they need to implement encoding.TextUnmarshaler or query.StringSetter
 }
 
