@@ -33,7 +33,7 @@ func (q Query) Validate() (problems []problem.ParamError) {
   // Here you can set up your custom validation
   if q.Foo != "allowed_value" {
     problems = append(problems, problem.ParamError{
-      Field: "bar",
+      Field: "foo",
       Reason: "the value "+q.Foo+" is not allowed",
     })
   }
