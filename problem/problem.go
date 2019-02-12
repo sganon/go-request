@@ -100,7 +100,7 @@ var DefaultInput = Input{
 	},
 }
 
-var DefaultForbidden = Input{
+var DefaultForbidden = ForbiddenProblem{
 	Payload: &Payload{
 		Type:   "about:blank",
 		Title:  "Your are missing credentials or have insufficient rights",
