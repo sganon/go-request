@@ -65,6 +65,25 @@ func (u UnexpectedProblem) Send(w http.ResponseWriter) {
 	baseSend(w, http.StatusInternalServerError, u)
 }
 
+// ForbiddenProblem problem
+type ForbiddenProblem struct {
+	*Payload
+}
+
+// Error implements error interface
+func (f ForbiddenProblem) Error() string {
+	return ErrForbidden.Error()
+}
+
+// Send implements Problem interface
+func (f ForbiddenProblem) Send(w http.ResponseWriter) {
+	err := f.Validate()
+	if err != nil {
+		panic(err)
+	}
+	baseSend(w, http.StatusForbidden, f)
+}
+
 var DefaultUnexpected = UnexpectedProblem{
 	Payload: &Payload{
 		Type:   "about:blank",
@@ -78,5 +97,13 @@ var DefaultInput = Input{
 		Type:   "about:blank",
 		Title:  "Your parameters didn't validate",
 		Status: http.StatusBadRequest,
+	},
+}
+
+var DefaultForbidden = Input{
+	Payload: &Payload{
+		Type:   "about:blank",
+		Title:  "Your are missing credentials or have insufficient rights",
+		Status: http.StatusForbidden,
 	},
 }

@@ -9,6 +9,7 @@ var (
 	ErrInvalidPayload    = errors.New("invalid problem")
 	ErrInvalidParameters = errors.New("invalid parameters")
 	ErrUnexpected        = errors.New("unexpected error")
+	ErrForbidden         = errors.New("forbidden")
 )
 
 // Payload represents most basic problem of an `application/problem+json` response.
