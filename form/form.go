@@ -85,7 +85,6 @@ func (d *Decoder) Decode(v interface{}) error {
 
 func (d *Decoder) extractForm(key string, required bool, e reflect.Value) {
 	val := d.r.FormValue(key)
-	fmt.Println(key, val)
 	// If bool strict mode is deactivated having ?<key> will be evaluated as true
 	if val == "" && required && e.Type().Name() == "bool" && !d.BoolStrictMode {
 		e.SetBool(true)
