@@ -1,12 +1,12 @@
-package query_test
+package form_test
 
 import (
 	"io"
 	"net/http"
 	"testing"
 
+	"github.com/sganon/go-request/form"
 	"github.com/sganon/go-request/problem"
-	"github.com/sganon/go-request/query"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,13 +18,13 @@ type test struct {
 }
 
 type input struct {
-	Foo            string           `query:"foo"`
-	ID             int              `query:"id"`
-	IsPresent      bool             `query:"is_present"`
-	ImportantField string           `query:"imp,required"`
-	Temperature    float32          `query:"temperature"`
-	IDList         query.IntList    `query:"id_list"`
-	Authors        query.StringList `query:"authors"`
+	Foo            string          `form:"foo"`
+	ID             int             `form:"id"`
+	IsPresent      bool            `form:"is_present"`
+	ImportantField string          `form:"imp,required"`
+	Temperature    float32         `form:"temperature"`
+	IDList         form.IntList    `form:"id_list"`
+	Authors        form.StringList `form:"authors"`
 }
 
 var tests = []test{
@@ -103,7 +103,7 @@ var tests = []test{
 		Input: input{},
 		Output: input{
 			ImportantField: "here",
-			IDList:         query.IntList{21, 42, 84},
+			IDList:         form.IntList{21, 42, 84},
 		},
 	},
 	{
@@ -119,7 +119,7 @@ var tests = []test{
 		Input: input{},
 		Output: input{
 			ImportantField: "here",
-			Authors:        query.StringList{"sganon", "ganondorf"},
+			Authors:        form.StringList{"sganon", "ganondorf"},
 		},
 	},
 	{
@@ -132,12 +132,12 @@ var tests = []test{
 
 var suite []test
 
-func TestQueryDecoder(t *testing.T) {
+func TestFormDecoder(t *testing.T) {
 	var body io.Reader
 	for i, te := range tests {
 		req, err := http.NewRequest("GET", "http://localhost:80/"+te.Query, body)
 		assert.Nil(t, err, "request should have been created", i)
-		decoder := query.NewDecoder(req)
+		decoder := form.NewDecoder(req)
 		err = decoder.Decode(&te.Input)
 		if te.ShouldErr {
 			assert.Equal(t, problem.ErrInvalidParameters.Error(), err.Error(), "error should be equal to predefined one", i)

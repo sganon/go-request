@@ -6,20 +6,20 @@ import (
 
 	"github.com/sganon/go-request"
 	"github.com/sganon/go-request/problem"
-	"github.com/sganon/go-request/query"
+	"github.com/sganon/go-request/form"
 )
 
-// Query Define a the model of an expected query
-type Query struct {
-	Foo   string           `query:"foo"`
-	IDs   query.IntList    `query:"ids,required"`
-	Names query.StringList `query:"names"`
+// Form Define a the model of an expected form
+type Form struct {
+	Foo   string           `form:"foo"`
+	IDs   form.IntList    `form:"ids,required"`
+	Names form.StringList `form:"names"`
 }
 
 // Validate implements request.Output
 // This is executed after request decoding
 // You can implement specific logic in here
-func (q Query) Validate() (problems []problem.ParamError) {
+func (q Form) Validate() (problems []problem.ParamError) {
 	if q.Foo != "" && q.Foo != "bar" {
 		problems = append(problems, problem.ParamError{
 			Field:  "foo",
@@ -35,14 +35,14 @@ func (q Query) Validate() (problems []problem.ParamError) {
 	return problems
 }
 
-// QueryHandler shows how to handles query decoding and error response handling
+// QueryHandler shows how to handles form decoding and error response handling
 // This handler is used in example_test.go.
 func QueryHandler(w http.ResponseWriter, r *http.Request) {
-	var query Query
-	problem := request.Decode(r, &query, nil)
+	var form Form
+	problem := request.Decode(r, &form, nil)
 	if problem != nil {
 		problem.Send(w)
 		return
 	}
-	// From here the query is decoded, validated
+	// From here the form is decoded, validated
 }
