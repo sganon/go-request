@@ -5,7 +5,7 @@
 
 ## About
 
-This package was develop to ease request parameters decoding, both in query and in body (json for now). It also provide
+This package was develop to ease request parameters decoding, both in form (i.e. query, url-encoded, multipart etc.) and in JSON body. It also provide
 an error handling based on [RFC-7807](https://tools.ietf.org/html/rfc7807), the errors are those from
 decoding (i.e a type error), and those you defines.
 
@@ -14,22 +14,22 @@ Also the rfc implementation is just the bare minimum.
 
 ## Get Started
 
-First of all you need to define models for your parameters, one for your query parameters, and one for your body (or just one of those if you only need one ofc). 
+First of all you need to define models for your parameters, one for your form parameters, and one for your body (or just one of those if you only need one ofc). 
 
 A model contains field with some tags and a `Validate` methods where you can implement your custom
 error handling.
 
 ```go
-// Query represents the expected query parameters of your request
-type Query struct {
-  Foo string        `query:"foo"` // the 'foo' query parameter will be stored into this field
-  Bar int           `query:"bar,required"` // this parameter is required
-  IDs query.IntList `query:"ids"` // this type is an helper to store `ids=1,2,3....` into an int slice
+// Form represents the expected form parameters of your request
+type Form struct {
+  Foo string        `form:"foo"` // the 'foo' form parameter will be stored into this field
+  Bar int           `form:"bar,required"` // this parameter is required
+  IDs form.IntList  `form:"ids"` // this type is an helper to store `ids=1,2,3....` into an int slice
   // You can set custom types but they need to implement encoding.TextUnmarshaler or query.StringSetter
 }
 
 // Validate implements request.Output
-func (q Query) Validate() (problems []problem.ParamError) {
+func (q Form) Validate() (problems []problem.ParamError) {
   // Here you can set up your custom validation
   if q.Foo != "allowed_value" {
     problems = append(problems, problem.ParamError{
@@ -53,17 +53,17 @@ import (
 
 func YourHandler(w http.ResponseWriter, r *http.Request) {
   // see explanations above for these types
-  var query Query
+  var form Form
   var body Body
 
-  // You can pass nil for query or body if you don't want it to be decoded
-  problem := request.Decode(r, &query, &body)
+  // You can pass nil for form or body if you don't want it to be decoded
+  problem := request.Decode(r, &form, &body)
   if problem != nil {
     // An input problem has been detected, send it and stop
     problem.Send(w)
     return
   }
-  // From here query, and body has been populated and their values validated
+  // From here form, and body has been populated and their values validated
 }
 ```
 
