@@ -2,6 +2,7 @@ package problem
 
 import (
 	"errors"
+	"net/http"
 )
 
 // Differents problem issues
@@ -28,4 +29,9 @@ func (p *Payload) Validate() error {
 		return ErrInvalidPayload
 	}
 	return nil
+}
+
+// Send implements Problem
+func (p Payload) Send(w http.ResponseWriter) {
+	baseSend(w, p.Status, p)
 }
