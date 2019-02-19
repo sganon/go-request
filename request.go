@@ -5,33 +5,33 @@ import (
 	"net/http"
 
 	"github.com/sganon/go-request/problem"
-	"github.com/sganon/go-request/query"
+	"github.com/sganon/go-request/form"
 )
 
 type Output interface {
 	Validate() []problem.ParamError
 }
 
-func Decode(r *http.Request, queryOutput Output, bodyOutput Output) problem.Problem {
+func Decode(r *http.Request, formOutput Output, bodyOutput Output) problem.Problem {
 	var ok bool
 	var inputProblem *problem.Input
 	var unexpectedProblem *problem.UnexpectedProblem
-	if queryOutput != nil {
-		queryDecoder := query.NewDecoder(r)
-		err := queryDecoder.Decode(queryOutput)
+	if formOutput != nil {
+		formDecoder := form.NewDecoder(r)
+		err := formDecoder.Decode(formOutput)
 		if prob, ok := err.(*problem.Input); ok && prob != nil {
 			inputProblem = prob
 		}
 		if unexpectedProblem, ok = err.(*problem.UnexpectedProblem); ok && unexpectedProblem != nil {
 			return unexpectedProblem
 		}
-		queryErrors := queryOutput.Validate()
-		if len(queryErrors) > 0 {
+		formErrors := formOutput.Validate()
+		if len(formErrors) > 0 {
 			if inputProblem == nil {
 				prob := problem.DefaultInput
 				inputProblem = &prob
 			}
-			inputProblem.InvalidParams = append(inputProblem.InvalidParams, queryErrors...)
+			inputProblem.InvalidParams = append(inputProblem.InvalidParams, formErrors...)
 		}
 	}
 	if bodyOutput != nil {

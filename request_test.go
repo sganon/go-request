@@ -14,14 +14,14 @@ import (
 )
 
 type inputQuery struct {
-	Foo string `query:"foo,required"`
+	Foo string `form:"foo,required"`
 }
 
 func (q inputQuery) Validate() (errs []problem.ParamError) {
 	if q.Foo != "bar" {
 		errs = append(errs, problem.ParamError{
 			Field:  "foo",
-			Reason: "in query foo key should have `bar` value",
+			Reason: "in form foo key should have `bar` value",
 		})
 	}
 	return errs
@@ -115,13 +115,13 @@ func TestDecode(t *testing.T) {
 }
 
 var handlerFunc = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	var query inputQuery
+	var form inputQuery
 	var body inputBody
 	var problem problem.Problem
 	if r.Method == "POST" {
-		problem = request.Decode(r, &query, &body)
+		problem = request.Decode(r, &form, &body)
 	} else {
-		problem = request.Decode(r, &query, nil)
+		problem = request.Decode(r, &form, nil)
 	}
 	if problem != nil {
 		problem.Send(w)

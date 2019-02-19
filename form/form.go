@@ -1,14 +1,19 @@
-package query
+package form
 
 import (
 	"encoding"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strconv"
 
 	"github.com/fatih/structtag"
 	"github.com/sganon/go-request/problem"
+)
+
+const (
+	mb = 1 << 20
 )
 
 // Decoder handles unmarshalling and validation of its request's query
@@ -28,30 +33,59 @@ func NewDecoder(r *http.Request) *Decoder {
 
 // Decode input data from its request and stores it onto i.
 func (d *Decoder) Decode(v interface{}) error {
-	// call ParseForm to prepare query extraction
-	if err := d.r.ParseForm(); err != nil {
-		return problem.DefaultUnexpected
-	}
-
 	elem := reflect.ValueOf(v).Elem()
 	// Loop through each fields of v checking for correct input rules.
 	for i := 0; i < elem.NumField(); i++ {
 		fieldTag := elem.Type().Field(i).Tag
 
 		tags, err := structtag.Parse(string(fieldTag))
-		inputTag, err := tags.Get("query")
 		if err != nil {
+			return problem.DefaultUnexpected
+		}
+		queryTag, noFormErr := tags.Get("form")
+		fileTag, noFileErr := tags.Get("file")
+		if noFormErr != nil && noFileErr != nil {
 			// Skip if field has no input tag
 			continue
 		}
 
-		d.extractQuery(inputTag.Name, inputTag.HasOption("required"), elem.Field(i))
+		if queryTag != nil {
+			d.extractForm(queryTag.Name, queryTag.HasOption("required"), elem.Field(i))
+		}
+		if fileTag != nil {
+			if err := d.r.ParseMultipartForm(5 * mb); err != nil {
+				return problem.DefaultUnexpected
+			}
+			e := elem.Field(i)
+			file, _, err := d.r.FormFile(fileTag.Name)
+			if err != nil && fileTag.HasOption("required") {
+				d.addParamsError(problem.ParamError{
+					Field:  fileTag.Name,
+					Reason: "this file is required",
+				})
+				continue
+			} else if err != nil && !fileTag.HasOption("required") {
+				continue
+			}
+
+			b, err := ioutil.ReadAll(file)
+			if err != nil {
+				return problem.DefaultUnexpected
+			}
+			if err = e.Addr().Interface().(encoding.BinaryUnmarshaler).UnmarshalBinary(b); err != nil {
+				d.addParamsError(problem.ParamError{
+					Field:  fileTag.Name,
+					Reason: fmt.Sprintf("an error occured via UnmarshalBinary: %v", err),
+				})
+			}
+		}
 	}
 	return d.Input
 }
 
-func (d *Decoder) extractQuery(key string, required bool, e reflect.Value) {
+func (d *Decoder) extractForm(key string, required bool, e reflect.Value) {
 	val := d.r.FormValue(key)
+	fmt.Println(key, val)
 	// If bool strict mode is deactivated having ?<key> will be evaluated as true
 	if val == "" && required && e.Type().Name() == "bool" && !d.BoolStrictMode {
 		e.SetBool(true)
@@ -78,7 +112,7 @@ func (d *Decoder) addParamsError(e problem.ParamError) {
 
 func (d *Decoder) initInputProblem() {
 	prob := problem.DefaultInput
-	prob.Title = "Your query parameters could not be decoded"
+	prob.Title = "Your form parameters could not be decoded"
 	d.Input = &prob
 }
 

@@ -1,4 +1,4 @@
-package query
+package form
 
 import (
 	"encoding"
@@ -14,8 +14,9 @@ type StringSetter interface {
 
 // Types implementing TexTUnmarshaler and StringSetter used on unmarshalling
 var (
-	TextUnmarshalerType = reflect.TypeOf(new(encoding.TextUnmarshaler)).Elem()
-	StringSetterType    = reflect.TypeOf(new(StringSetter)).Elem()
+	TextUnmarshalerType   = reflect.TypeOf(new(encoding.TextUnmarshaler)).Elem()
+	BinaryUnmarshalerType = reflect.TypeOf(new(encoding.BinaryUnmarshaler)).Elem()
+	StringSetterType      = reflect.TypeOf(new(StringSetter)).Elem()
 )
 
 // IntList implements encoding.TextUnmarshaler in order to extract query
