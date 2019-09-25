@@ -32,12 +32,7 @@ var queryTests = []struct {
 	},
 	{
 		QueryString:    "?ids=1,2,3,4&names=simon,pierre,jacques,ganon",
-		ExpectedStatus: http.StatusBadRequest,
-		ErrorsLen:      1,
-		Errors: []problem.ParamError{{
-			Field:  "names",
-			Reason: "too much names given",
-		}},
+		ExpectedStatus: http.StatusOK,
 	},
 	{
 		QueryString:    "?ids=foo,bar,baz",
@@ -46,15 +41,6 @@ var queryTests = []struct {
 		Errors: []problem.ParamError{{
 			Field:  "ids",
 			Reason: "an error occured via UnmarshalText: strconv.Atoi: parsing \"foo\": invalid syntax",
-		}},
-	},
-	{
-		QueryString:    "?ids=1,2,3,4&foo=baz",
-		ExpectedStatus: http.StatusBadRequest,
-		ErrorsLen:      1,
-		Errors: []problem.ParamError{{
-			Field:  "foo",
-			Reason: "value baz is not acceptable",
 		}},
 	},
 }
