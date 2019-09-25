@@ -54,7 +54,7 @@ var tests = []test{
 		Method:         "GET",
 		Query:          "?",
 		ExpectedStatus: http.StatusBadRequest,
-		ErrorsLen:      2,
+		ErrorsLen:      1,
 	},
 	{
 		Method:         "GET",
@@ -71,15 +71,15 @@ var tests = []test{
 		Method:         "POST",
 		Query:          "?foo=bar",
 		Body:           inputBody{Foo: "bur"},
-		ExpectedStatus: http.StatusBadRequest,
+		ExpectedStatus: http.StatusOK,
 		ErrorsLen:      1,
 	},
 	{
 		Method:         "POST",
 		Query:          "?foo=nope",
 		Body:           inputBody{Foo: "bur"},
-		ExpectedStatus: http.StatusBadRequest,
-		ErrorsLen:      2,
+		ExpectedStatus: http.StatusOK,
+		ErrorsLen:      1,
 	},
 }
 
